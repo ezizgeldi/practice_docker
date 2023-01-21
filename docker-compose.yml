@@ -1,6 +1,24 @@
-web:
-  build: .
-  ports:
-    - "5000:5000"
-  volumes:
-    - .:/app
+version: '3'
+services:
+  flask:
+    build:
+      context: app
+      dockerfile: Dockerfile
+    container_name: flask
+    image: flask-python:3
+    restart: unless-stopped
+    enviroment:
+      APP_ENV: "prod"
+      APP_DEBUG: "False"
+      APP_PORT: 5000
+      MONGODB_DATABASE: flaskdb
+      MONGODB_USERNAME: flaskuser
+      MONGODB_PASSWORD: Qwerty123
+      MONGODB_HOSTNAME: mongodb
+    volumes:
+      - appdata:/var/www
+    depends_on:
+      - mongodb
+    network:
+      - frontend
+      - backend
