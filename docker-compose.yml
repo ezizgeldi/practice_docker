@@ -1,24 +1,33 @@
 version: '3'
 services:
-  flask:
-    build:
-      context: app
-      dockerfile: Dockerfile
-    container_name: flask
-    image: flask-python:3
-    restart: unless-stopped
-    enviroment:
-      APP_ENV: "prod"
-      APP_DEBUG: "False"
-      APP_PORT: 5000
-      MONGODB_DATABASE: flaskdb
-      MONGODB_USERNAME: flaskuser
-      MONGODB_PASSWORD: Qwerty123
-      MONGODB_HOSTNAME: mongodb
+  db:
+    image: postgres:15-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
     volumes:
-      - appdata:/var/www
-    depends_on:
-      - mongodb
-    network:
-      - frontend
-      - backend
+      - ./gp_data:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: docker_test
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+  app:
+    image: ezizgeldi/alpine-node:v1
+    container_name: application
+    ports:
+      - 3000:8080
+    environment:
+      POSTGRES_HOST: db
+    restart: always
+    links:
+      - db
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - app
+    ports:
+      - 8989:8989
