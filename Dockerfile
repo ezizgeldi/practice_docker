@@ -1,11 +1,8 @@
-FROM alpine
+FROM python:3.10
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
 
 
-RUN apk add npm && npm i -g http-server
-VOLUME /home/server/
-WORKDIR	/home/server
-COPY ./ /home/server/
-EXPOSE 8080
-
-
-CMD http-server
+ENTRYPOINT ["python"]
+CMD ["app.py"]
